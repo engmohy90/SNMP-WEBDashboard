@@ -1,0 +1,77 @@
+* {
+    font-family: "osefin Slab", serif;
+}
+
+body {
+    background-color: #cedbe6;
+}
+
+.Clogo {
+    float: left;
+    margin: 15px;
+}
+
+.Clist {
+    list-style: none;
+}
+
+textarea {
+    width: 450px;
+    height: 150px;
+}
+
+.title {
+    width: 150px;
+    height: 30px;
+}
+
+.created {
+    color: #32bcfb;
+    float: right;
+    font-size: .7em;
+}
+
+.post {
+    background-color: #c9eafb;
+}
+
+.username {
+    color: #8a2be2;
+    border-style: double;
+    border-color: black;
+}
+
+.username_c {
+    color: #8a2be2;
+    border-style: double;
+    border-color: black;
+}
+
+.login-status {
+    display: inline-flex;
+    margin-top: 4px;
+}
+
+.ch-login-status {
+    margin-right: 10px;
+
+}
+
+.loginForm {
+    max-width: 640px;
+    margin: auto;
+}
+
+hr {
+    border-width: 3px;
+}
+.welcome{
+    margin-bottom: 7em;
+}
+
+
+
+
+
+
+

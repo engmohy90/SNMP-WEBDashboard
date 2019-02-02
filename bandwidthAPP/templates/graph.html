@@ -1,0 +1,161 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="{% static "jquery-3.3.1.min.js" %}"></script>
+    <head>
+        <script src="{% static "moment.min.js" %}"></script>
+        <script src="{% static "Chart.min.js" %}"></script>
+        <script src="{% static "chartjs-plugin-streaming.min.js" %}"></script>
+    </head>
+    <title>{{ ip }}</title>
+</head>
+<body>
+
+<h3 style="text-align: center"> router {{ ip }}
+    <small>interface {{ interface }} rate digram</small>
+</h3>
+<div style="position: relative; height:40vh; width:80vw;margin: auto;">
+    <canvas id="myChart"></canvas>
+</div>
+<script>
+    $(document).ready(function () {
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        //setInterval(function () {
+        function getDataF(chart) {
+            debugger;
+            var getData = $.post("getDataGraph/", {ip: "{{ ip }}", interface: "{{ interface }}"});
+            getData.done(function (data) {
+                debugger;
+                console.log("Data Loaded: " + data);
+                chart.config.data.datasets[1].data.push({
+                    x: Date.now(),
+                    y: data.input
+                });
+                chart.config.data.datasets[0].data.push({
+                    x: Date.now(),
+                    y: data.output
+                });
+            });
+            getData.fail(function (data) {
+                alert("failed" + data);
+                getData();
+            });
+        }
+
+        ////////////////chart js/////////////////
+        var chartColors = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+
+        function onRefresh(chart) {
+            debugger;
+            getDataF(chart);
+        }
+
+        var color = Chart.helpers.color;
+        var config = {
+            responsive: false,
+            width: 400,
+            height: 400,
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'output',
+                    backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
+                    borderColor: chartColors.red,
+                    fill: false,
+                    lineTension: 0,
+                    borderDash: [8, 4],
+                    data: []
+                }, {
+                    label: 'input',
+                    backgroundColor: color(chartColors.blue).alpha(0.5).rgbString(),
+                    borderColor: chartColors.blue,
+                    fill: false,
+                    cubicInterpolationMode: 'monotone',
+                    data: []
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Line chart output input rate'
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'realtime',
+                        realtime: {
+                            duration: 20000,
+                            refresh: 1000,
+                            delay: 2000,
+                            onRefresh: onRefresh
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'value'
+                        }
+                    }]
+                },
+                tooltips: {
+                    mode: 'nearest',
+                    intersect: false
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: false
+                }
+            }
+        };
+
+        window.onload = function () {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            window.myChart = new Chart(ctx, config);
+        };
+
+    })
+
+
+</script>
+</body>
+</html>
