@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from models import RouterData
+from .models import RouterData
 from django.contrib.auth.decorators import login_required
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 import time
